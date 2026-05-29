@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>PixelForge AI</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="pixelforge.css">
+
+</head>
+<body data-theme="dark">
+<div class="mobile-overlay" id="mob-overlay" onclick="closePanels()"></div>
+
+<!-- ══ SIDEBAR ══ -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-top">
+    <div class="logo">
+      <div class="logo-icon">🎨</div>
+      <div class="logo-text">Pixel<span>Forge</span></div>
+    </div>
+    <button class="new-chat-btn" onclick="newChat()"><span>✏️</span> New Generation</button>
+  </div>
+  <div class="sidebar-section">
+    <div class="sidebar-label">Navigation</div>
+    <div class="nav-item active" id="nav-gen" onclick="setNav('gen')"><span class="nav-icon">🎨</span> Generate</div>
+    <div class="nav-item" id="nav-history" onclick="loadHistory()"><span class="nav-icon">🕒</span> History</div>
+    
+  </div>
+  <div class="sidebar-section" style="flex:1;overflow:hidden;">
+    <div class="sidebar-label">Recent</div>
+    <div id="history-list">
+      <div class="hist-item"><span class="hist-dot"></span><span class="hist-text">Luxury coffee brand poster</span></div>
+      <div class="hist-item"><span class="hist-dot"></span><span class="hist-text">Instagram story — summer</span></div>
+      <div class="hist-item"><span class="hist-dot"></span><span class="hist-text">Diwali festival banner</span></div>
+    </div>
+  </div>
+  <div class="sidebar-bottom">
+    <div class="user-pill" onclick="setNav('settings')">
+      <div class="user-avatar" id="sb-avatar">?</div>
+      <div class="user-info">
+        <div class="user-name" id="sb-name">Not logged in</div>
+        <div class="user-role" id="sb-role">Login to continue</div>
+      </div>
+      <span style="color:var(--muted);">›</span>
+    </div>
+  </div>
+</aside>
+
+<!-- ══ MAIN ══ -->
+<main class="main">
+  <div class="topbar">
+    <div class="topbar-left">
+      <button class="menu-btn icon-btn" onclick="toggleSidebar()">☰</button>
+      <div class="backend-badge checking" id="backend-badge">
+        <div class="status-dot"></div>
+        
+         <span id="badge-text">Checking…</span>
+        
+      </div>
+    </div>
+    <div class="topbar-right">
+      <button class="icon-btn theme-btn" onclick="toggleTheme()" title="Toggle theme">🌙</button>
+      <button class="icon-btn" onclick="setNav('settings')" title="Settings">👤</button>
+    </div>
+  </div>
+
+  <div class="chat-area" id="chat-area">
+    <div class="chat-inner" id="chat-inner">
+      <div class="welcome" id="welcome-screen">
+        <div class="welcome-icon">🎨</div>
+        <h2>What will you create today?</h2>
+        <p>Describe your image idea below. Our AI will <strong style="color:var(--teal2)">enhance your prompt</strong> automatically using Groq, then generate with Pollinations AI.</p>
+        <div class="suggestion-chips">
+          <div class="chip" onclick="useChip('A luxury perfume brand poster, gold and black')">🪙 Luxury brand poster</div>
+          <div class="chip" onclick="useChip('Diwali festival greeting card, diyas and rangoli')">🪔 Festival greeting</div>
+          <div class="chip" onclick="useChip('Modern tech startup banner, blue gradient')">💻 Tech banner</div>
+          <div class="chip" onclick="useChip('Cute coffee shop Instagram post, pastel aesthetic')">☕ Coffee shop post</div>
+          <div class="chip" onclick="useChip('Motivational quote WhatsApp status, dark background')">💬 Quote status</div>
+          <div class="chip" onclick="useChip('Summer sale banner 50% off, vibrant colors')">🛍️ Sale banner</div>
+        </div>
+      </div>
+      <div id="messages"></div>
+    </div>
+  </div>
+
+  <!-- Input Area -->
+  <div class="input-area">
+    <div class="input-inner">
+      <div class="prompt-suggestions">
+        <div class="p-chip" onclick="useChip('Holi festival poster, colors, joy')">🎨 Holi Poster</div>
+        <div class="p-chip" onclick="useChip('Professional LinkedIn banner, corporate blue')">💼 LinkedIn Banner</div>
+        <div class="p-chip" onclick="useChip('Birthday invitation card, balloons, celebration')">🎂 Birthday Card</div>
+        
+      </div>
+      <div class="input-box">
+        <textarea id="main-prompt" placeholder="Describe your image idea… AI will enhance it automatically ✨" rows="1"
+          onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+        <div class="input-controls">
+          <button class="ctrl-btn" title="Clear" onclick="clearPrompt()">🗑️</button>
+          <button class="send-btn" id="send-btn" onclick="generateImage()" title="Generate">▶</button>
+        </div>
+      </div>
+      <div class="input-footer">
+        <div class="dim-pills" id="dim-pills">
+          <div class="dim-pill active" data-w="1080" data-h="1920" onclick="selectDimPill(this,'WhatsApp — 1080×1920')">📱 WhatsApp</div>
+          <div class="dim-pill" data-w="1080" data-h="1920" onclick="selectDimPill(this,'IG Story — 1080×1920')">📸 IG Story</div>
+          <div class="dim-pill" data-w="1080" data-h="1080" onclick="selectDimPill(this,'IG Post — 1080×1080')">🟦 IG Post</div>
+          <div class="dim-pill" data-w="1200" data-h="628"  onclick="selectDimPill(this,'FB Post — 1200×628')">📘 Facebook</div>
+          <div class="dim-pill" data-w="1280" data-h="720"  onclick="selectDimPill(this,'YouTube — 1280×720')">▶️ YouTube</div>
+          <div class="dim-pill" data-w="1080" data-h="1080" onclick="selectDimPill(this,'Twitter — 1080×1080')">🐦 Twitter</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <select class="type-select" id="design-type">
+            <option value="general">🖼️ General</option>
+            <option value="poster">🪧 Poster</option>
+            <option value="banner">📢 Banner</option>
+           
+          </select>
+          <span class="input-hint" id="dim-label">📐 WhatsApp — 1080×1920</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- ══ RIGHT PANEL ══ -->
+<aside class="right-panel hidden" id="right-panel">
+  <div class="panel-header">
+    <span class="panel-title" id="panel-title">Settings</span>
+    <button class="panel-close" onclick="closePanel()">×</button>
+  </div>
+  <div class="panel-body" id="panel-body"></div>
+</aside>
+
+<!-- ══ AUTH OVERLAY ══ -->
+<div class="auth-overlay" id="auth-overlay">
+<div class="auth-card">
+  <div class="auth-logo">
+    <div class="auth-logo-icon">🎨</div>
+    <h1>Pixel<span>Forge</span></h1>
+    <p>AI-Powered Design Generator</p>
+  </div>
+  <div class="auth-tabs">
+    <button class="auth-tab active" onclick="switchAuth('login')">🔑 Login</button>
+    <button class="auth-tab" onclick="switchAuth('signup')">✨ Sign Up</button>
+  </div>
+  <div class="role-label-txt" id="role-label">Login as</div>
+  <div class="role-row">
+    <div class="role-card active" onclick="selectRole('other',this)">
+      <span class="chk">✓</span><span class="ri">👤</span><span class="rn">Other User</span><span class="rs">Personal / Creative</span>
+    </div>
+    <div class="role-card" onclick="selectRole('business',this)">
+      <span class="chk">✓</span><span class="ri">💼</span><span class="rn">Businessman</span><span class="rs">Brand / Marketing</span>
+    </div>
+  </div>
+  <div class="auth-err" id="auth-error"></div>
+  <div class="a-group"><label class="a-label">Username</label><input class="a-input" type="text" id="f-username" placeholder="e.g. john_doe"/></div>
+  <div class="a-group"><label class="a-label">Email</label><input class="a-input" type="email" id="f-email" placeholder="you@example.com"/></div>
+  <div id="pwd-group">
+    <div class="a-group"><label class="a-label">Password</label><input class="a-input" type="password" id="f-password" placeholder="••••••••"/></div>
+    <div class="slide-field" id="confirm-field">
+      <div class="a-group"><label class="a-label">Confirm Password</label><input class="a-input" type="password" id="f-confirm" placeholder="••••••••"/></div>
+    </div>
+  </div>
+  <div class="slide-field" id="biz-field">
+    <div class="a-group"><label class="a-label">Business Name</label><input class="a-input" type="text" id="f-bizname" placeholder="Acme Marketing Pvt. Ltd."/></div>
+    <div class="a-group"><label class="a-label">Business Address</label><textarea class="a-input" id="f-bizaddr" rows="2" placeholder="42 MG Road, Pune, MH 411001"></textarea></div>
+  </div>
+  <button class="auth-submit" id="submit-btn" onclick="handleSubmit()">🚀 Login as Other User</button>
+  <div class="auth-divider">or</div>
+  <div class="auth-footer-txt" id="auth-footer">Don't have an account? <button class="auth-link" onclick="switchAuth('signup')">Create one free</button></div>
+</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+
+<script src="pixelforge.js"></script>
+</body>
+</html>
